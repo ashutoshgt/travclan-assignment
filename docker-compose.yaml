@@ -5,7 +5,7 @@ services:
     ports: 
       - "127.0.0.1:8080:8080"
     environment:
-      - ELASTICSEARCH_UR=http://es:9200
+      - ELASTICSEARCH_URL=http://es:9200
 
   es:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.15.1
