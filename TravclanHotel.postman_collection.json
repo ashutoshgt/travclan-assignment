@@ -1,0 +1,70 @@
+{
+	"info": {
+		"_postman_id": "2e256528-ef52-48d3-9b22-47022a07b6cf",
+		"name": "Travclan Hotel",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2605594"
+	},
+	"item": [
+		{
+			"name": "Query w/o any params (returns 50 at max)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/hotels",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"hotels"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Query with the name param",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/hotels?name=effert",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"hotels"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "effert"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Query with the bounds params",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Query with incorrect bounds param",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}

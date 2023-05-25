@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -11,18 +12,68 @@ const HOTEL_INDEX = "hotels"
 
 func hotelHandler(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
+
+	tlLatstr := r.URL.Query().Get("tl_lat")
+	tlLonstr := r.URL.Query().Get("tl_lon")
+	brLatstr := r.URL.Query().Get("br_lat")
+	brLonstr := r.URL.Query().Get("br_lon")
+
+	var bounds Bounds
+
+	if tlLatstr != "" && tlLonstr != "" && brLatstr != "" && brLonstr != "" {
+		tlLat, err := strconv.ParseFloat(tlLatstr, 64)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("Invalid top left latitude"))
+			return
+		}
+		
+		tlLon, err := strconv.ParseFloat(tlLonstr, 64)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("Invalid top left longitude"))
+			return
+		}
+		
+		brLat, err := strconv.ParseFloat(brLatstr, 64)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("Invalid bottom right latitude"))
+			return
+		}
+		
+		brLon, err := strconv.ParseFloat(brLonstr, 64)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("Invalid bottom right longitude"))
+			return
+		}
+
+		if tlLat < brLat || tlLon > brLon {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("Co-ordinates may not be in the correct order"))
+			return
+		}
+
+		bounds = Bounds{tlLat, tlLon, brLat, brLon}
+	}
 	
+	var hotels *[]Hotel
+	
+	hotels = searchHotels(name, &bounds)
+	
+	jsonResp, err := json.Marshal(hotels)
+	
+	if err != nil {
+		log.Printf("Error in JSON marshalling hotels. Err: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Something went wrong"))
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	
-	resp := map[string]string{
-		"name": name,
-	}
-	
-	jsonResp, err := json.Marshal(resp)
-	if err != nil {
-		log.Fatalf("Error happened in JSON marshal. Err: %s", err)
-	}
 	w.Write(jsonResp)
 }
 
