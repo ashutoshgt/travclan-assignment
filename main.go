@@ -1,14 +1,15 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
 	"encoding/json"
 	"log"
+	"net/http"
+	"time"
 )
 
+const HOTEL_INDEX = "hotels"
+
 func hotelHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(r.URL)
 	name := r.URL.Query().Get("name")
 	
 	w.WriteHeader(http.StatusOK)
@@ -27,8 +28,19 @@ func hotelHandler(w http.ResponseWriter, r *http.Request) {
 
 
 func main()  {
-	es()
-	log.Println("Starting server")
+	
+	// Connecting to ElasticSearch and waiting till it's ready
+	for {
+		if esConnection := getESConnection(); esConnection != nil {
+			break
+		}
+		time.Sleep(5 * time.Second)
+	}
+
+	createHotelIndex()
+	populateHotelIndex()
+
 	http.HandleFunc("/hotels", hotelHandler)
+	log.Println("Starting server on http://localhost:8080")
 	http.ListenAndServe(":8080", nil)
 }
