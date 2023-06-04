@@ -1,5 +1,11 @@
+import { Wrapper } from "@googlemaps/react-wrapper";
+import { useEffect, useRef } from 'react';
+import './App.css';
+import { Hotel } from './types';
 
-function HotelRow({ hotel }) {
+
+
+function HotelRow({ hotel }: {hotel: Hotel}) {
   return (
     <tr>
       <td>{hotel.name}</td>
@@ -9,8 +15,8 @@ function HotelRow({ hotel }) {
   );
 }
 
-function HotelTable({ hotels }) {
-  const rows = [];
+function HotelTable({ hotels }: {hotels: Hotel[]}) {
+  const rows:JSX.Element[] = [];
 
   hotels.forEach((hotel) => {
     rows.push(
@@ -42,13 +48,18 @@ function SearchBar() {
   );
 }
 
-function HotelApp({ hotels }) {
-  return (
-    <div>
-      <SearchBar />
-      <HotelTable hotels={hotels} />
-    </div>
-  );
+function HotelMapComponent({center, zoom}: {center: google.maps.LatLngLiteral, zoom:number}) {
+
+  const ref = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    new window.google.maps.Map(ref.current as HTMLElement, {
+      center,
+      zoom,
+    });
+  });
+
+  return <div ref={ref} id="map" />;
 }
 
 const HOTELS = [
@@ -64,8 +75,18 @@ const HOTELS = [
   {"id":10,"name":"Borer Inc","address":"57 Forest Dale Court","location": {"lat":28.834291,"lon":77.427318}}
 ];
 
-export default function Home() {
+function App() {
+  const center = {lat: 28.63263579001517, lng: 77.22187713523259};
+  const zoom = 4;
   return (
-    <HotelApp hotels={HOTELS} />
-  )
+    <div className="App">
+      <SearchBar />
+      <HotelTable hotels={HOTELS} />
+      <Wrapper apiKey={""}>
+        <HotelMapComponent center={center} zoom={zoom}/>
+      </Wrapper>
+    </div>
+  );
 }
+
+export default App;
