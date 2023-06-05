@@ -1,9 +1,9 @@
-import { Wrapper } from "@googlemaps/react-wrapper";
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './App.css';
 import { Hotel } from './types';
+import mapboxgl from 'mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
 
-
+mapboxgl.accessToken = 'pk.eyJ1IjoiYXNodXRvc2hndXB0YSIsImEiOiJjazl2OTAxODkwMjVsM2txbjg2dHViZHU3In0.N81A20aNf0S4HPbXAhOZXA';
 
 function HotelRow({ hotel }: {hotel: Hotel}) {
   return (
@@ -48,18 +48,30 @@ function SearchBar() {
   );
 }
 
-function HotelMapComponent({center, zoom}: {center: google.maps.LatLngLiteral, zoom:number}) {
+function HotelMapComponent() {
 
-  const ref = useRef<HTMLInputElement>(null);
+  const mapContainer = useRef<any>(null);
+  const map = useRef<mapboxgl.Map | null>(null);
+
+  const [lng, setLng] = useState(77.22187713523259);
+  const [lat, setLat] = useState(28.63263579001517);
+  const [zoom, setZoom] = useState(14);
 
   useEffect(() => {
-    new window.google.maps.Map(ref.current as HTMLElement, {
-      center,
-      zoom,
+    if (map.current) return; // initialize map only once
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: 'mapbox://styles/mapbox/streets-v12',
+      center: [lng, lat],
+      zoom: zoom
     });
   });
 
-  return <div ref={ref} id="map" />;
+  return (
+    <div>
+      <div ref={mapContainer} className="map-container" />
+    </div>
+  );
 }
 
 const HOTELS = [
@@ -82,9 +94,7 @@ function App() {
     <div className="App">
       <SearchBar />
       <HotelTable hotels={HOTELS} />
-      <Wrapper apiKey={""}>
-        <HotelMapComponent center={center} zoom={zoom}/>
-      </Wrapper>
+      <HotelMapComponent/>
     </div>
   );
 }
