@@ -35,7 +35,13 @@ function HotelTable({ hotels }: {hotels: Hotel[]}) {
           <th>Location</th>
         </tr>
       </thead>
-      <tbody>{rows}</tbody>
+      <tbody>
+        {
+          hotels.map((hotel: Hotel): JSX.Element => {
+            return <HotelRow hotel={hotel} key={hotel.id} />
+          })
+        }
+      </tbody>
     </table>
   );
 }
@@ -88,12 +94,23 @@ const HOTELS = [
 ];
 
 function App() {
-  const center = {lat: 28.63263579001517, lng: 77.22187713523259};
-  const zoom = 4;
+
+  const [hotels, setHotels] = useState(HOTELS);
+  
+  const fetchHotels = ()=>{
+    fetch('http://localhost:8080/hotels')
+      .then((response) => response.json())
+      .then((data) => setHotels(data))
+  }
+
+  useEffect(() => {
+    fetchHotels();
+  }, []);
+  
   return (
     <div className="App">
       <SearchBar />
-      <HotelTable hotels={HOTELS} />
+      <HotelTable hotels={hotels} />
       <HotelMapComponent/>
     </div>
   );
