@@ -20,6 +20,9 @@ func hotelHandler(w http.ResponseWriter, r *http.Request) {
 
 	var bounds Bounds
 
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+	w.Header().Set("Content-Type", "application/json")
+
 	if tlLatstr != "" && tlLonstr != "" && brLatstr != "" && brLonstr != "" {
 		tlLat, err := strconv.ParseFloat(tlLatstr, 64)
 		if err != nil {
@@ -72,8 +75,6 @@ func hotelHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-	w.Header().Set("Content-Type", "application/json")
 	
 	w.Write(jsonResp)
 }
